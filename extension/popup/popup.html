@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Conscious Shopper</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Eco-Conscious Shopper</h1>
+            <p class="subtitle">Sustainability Ratings</p>
+        </header>
+
+        <main>
+            <div id="loading" class="section hidden">
+                <div class="loader"></div>
+                <p>Analyzing sustainability...</p>
+            </div>
+
+            <div id="error" class="section hidden">
+                <div class="error-icon">⚠️</div>
+                <p id="error-message"></p>
+                <button id="retry-btn" class="btn btn-secondary">Retry</button>
+            </div>
+
+            <div id="results" class="section hidden">
+                <div class="brand-info">
+                    <h2 id="brand-name"></h2>
+                    <a id="product-link" href="#" target="_blank">View Product</a>
+                </div>
+
+                <div class="rating-card">
+                    <div class="overall-rating">
+                        <span class="label">Overall Grade</span>
+                        <span id="overall-grade" class="grade"></span>
+                    </div>
+
+                    <div class="category-ratings">
+                        <div class="category">
+                            <span class="category-label">Environmental</span>
+                            <span id="env-grade" class="grade"></span>
+                        </div>
+                        <div class="category">
+                            <span class="category-label">Labor Ethics</span>
+                            <span id="labor-grade" class="grade"></span>
+                        </div>
+                        <div class="category">
+                            <span class="category-label">Transparency</span>
+                            <span id="trans-grade" class="grade"></span>
+                        </div>
+                    </div>
+
+                    <div class="confidence">
+                        <span class="label">Confidence:</span>
+                        <span id="confidence-score"></span>
+                    </div>
+                </div>
+
+                <details class="rationale-section">
+                    <summary>View Detailed Analysis</summary>
+                    <div class="rationale-content">
+                        <div class="rationale-item">
+                            <h4>Overall</h4>
+                            <p id="rationale-overall"></p>
+                        </div>
+                        <div class="rationale-item">
+                            <h4>Environmental</h4>
+                            <p id="rationale-env"></p>
+                        </div>
+                        <div class="rationale-item">
+                            <h4>Labor</h4>
+                            <p id="rationale-labor"></p>
+                        </div>
+                        <div class="rationale-item">
+                            <h4>Transparency</h4>
+                            <p id="rationale-trans"></p>
+                        </div>
+                    </div>
+                </details>
+
+                <div class="meta-info">
+                    <p id="timestamp"></p>
+                    <p id="cached-indicator" class="hidden">📋 Cached result</p>
+                </div>
+            </div>
+
+            <div id="initial" class="section">
+                <p>Click "Analyze This Page" to get sustainability ratings for products on this page.</p>
+                <button id="analyze-btn" class="btn btn-primary">Analyze This Page</button>
+            </div>
+        </main>
+
+        <footer>
+            <p class="powered-by">Powered by Google Gemini & ADK</p>
+        </footer>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

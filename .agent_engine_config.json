@@ -1,0 +1,13 @@
+{
+  "min_instances": 0,
+  "max_instances": 5,
+  "resource_limits": {
+    "cpu": "2",
+    "memory": "4Gi"
+  },
+  "scaling": {
+    "cpu_utilization_target": 70,
+    "min_request_count": 1
+  },
+  "timeout": "300s"
+}

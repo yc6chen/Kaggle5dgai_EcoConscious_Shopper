@@ -1,0 +1,29 @@
+# Core Framework & Deployment
+google-cloud-aiplatform==1.38.0
+google-generativeai==0.3.0
+google-adk
+
+# Web Framework
+fastapi==0.104.0
+uvicorn==0.24.0
+
+# Web Scraping & HTTP
+playwright==1.40.0
+beautifulsoup4==4.12.2
+aiohttp==3.9.0
+requests==2.31.0
+
+# Data Validation & Models
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Environment & Configuration
+python-dotenv==1.0.0
+
+# OpenTelemetry for observability
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-google-genai==1.0.0
+
+# Additional utilities
+python-dateutil==2.8.2
