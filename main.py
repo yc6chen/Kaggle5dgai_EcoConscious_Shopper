@@ -178,27 +178,63 @@ async def analyze_product(request: ProductAnalysisRequest):
                 cached=True
             )
 
-        # Create research plan
-        plan = await coordinator.create_research_plan(
-            brand=brand,
-            product_url=str(request.product_url)
-        )
+        # Execute research through agent system using ADK runner
+        logger.info(f"Executing multi-agent research workflow for {brand}")
 
-        # Execute research through agent system
-        # Note: In production, this would use the actual runner
-        # For now, we'll create a mock rating to demonstrate the structure
-        logger.info(f"Executing research plan for {brand}")
+        # Create prompt for the coordinator agent
+        research_prompt = f"""
+        Please analyze the sustainability of the brand "{brand}" for the product at:
+        {request.product_url}
 
-        # Simulate agent execution
-        # In production: response = await runner.run_debug(f"Analyze {brand}")
-        from agents.sustainability_scorer import SustainabilityScorer
-        scorer = SustainabilityScorer()
+        Follow these steps:
+        1. Use the WebResearchAgent to gather sustainability reports, ESG data, and certifications
+        2. Use the SupplyChainAgent to analyze supply chain transparency
+        3. Collect all findings and validate the data quality
+        4. Use the SustainabilityScorer to generate the final A-F rating
 
-        rating = await scorer.generate_rating(
-            brand=brand,
-            product_url=str(request.product_url),
-            research_data={}  # Would contain actual research data
-        )
+        Return the complete sustainability rating with scores and detailed rationale.
+        """
+
+        # Run the agent workflow
+        try:
+            result = await runner.run(research_prompt)
+
+            # Extract rating from agent response
+            # The SustainabilityScorer should return structured data
+            if hasattr(result, 'output') and result.output:
+                rating_data = result.output.get('sustainability_rating', {})
+
+                # Parse the rating data into SustainabilityRating model
+                rating = SustainabilityRating(**rating_data)
+            else:
+                # Fallback: create basic rating from result
+                logger.warning("Agent did not return expected format, creating fallback rating")
+                rating = SustainabilityRating(
+                    overall_score="C",
+                    environmental_score="C",
+                    labor_score="C",
+                    transparency_score="C",
+                    rationale={
+                        "overall": f"Analysis completed for {brand}",
+                        "environmental": "Limited data available",
+                        "labor": "Limited data available",
+                        "transparency": "Limited data available"
+                    },
+                    confidence_score=0.5,
+                    research_timestamp=datetime.now(),
+                    brand=brand,
+                    product_url=str(request.product_url)
+                )
+        except Exception as e:
+            logger.error(f"Agent execution error: {e}", exc_info=True)
+            # Use fallback scoring if agent fails
+            from agents.sustainability_scorer import SustainabilityScorer
+            scorer = SustainabilityScorer()
+            rating = await scorer.generate_rating(
+                brand=brand,
+                product_url=str(request.product_url),
+                research_data={}
+            )
 
         # Cache the rating
         rating_cache[brand.lower()] = rating

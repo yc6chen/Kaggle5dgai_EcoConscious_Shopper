@@ -233,7 +233,7 @@ class WebResearchAgent:
         agent = Agent(
             name="WebResearchAgent",
             model=Gemini(
-                model="gemini-2.5-flash-lite",
+                model="gemini-2.5-flash",
                 retry_options=self.retry_config
             ),
             description="""

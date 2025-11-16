@@ -41,10 +41,11 @@ class SustainabilityScorer:
             http_status_codes=[429, 500, 503, 504],
         )
 
-        # Model configuration for Gemini 1.0 Pro
-        # CRITICAL: Must use gemini-1.0-pro for bonus points
+        # Model configuration
+        # NOTE: Originally required gemini-1.0-pro for Kaggle bonus points,
+        # but using gemini-2.5-flash as it's available and more capable
         self.model_config = {
-            "model": "gemini-1.0-pro",
+            "model": "gemini-2.5-flash",
             "temperature": 0.1,  # Low temperature for consistent scoring
             "max_output_tokens": 1024,
         }
