@@ -265,7 +265,7 @@ class ResearchCoordinator:
         coordinator = Agent(
             name="ResearchCoordinator",
             model=Gemini(
-                model="gemini-2.5-flash-lite",
+                model="gemini-2.5-flash",
                 retry_options=self.retry_config
             ),
             description="""

@@ -1,0 +1,107 @@
+# ADK Evaluation Configuration for Eco-Conscious Shopper
+# Run with: adk eval --config eval_config.yaml
+
+# Agent to evaluate
+agent: "agents.research_coordinator:coordinator_agent"
+
+# Test cases for evaluation
+test_cases:
+  - name: "Patagonia Sustainability Analysis"
+    input: "Analyze the sustainability of Patagonia for the product at https://www.patagonia.com/product/mens-better-sweater-jacket/25528.html"
+    expected_output:
+      contains:
+        - "environmental"
+        - "labor"
+        - "transparency"
+        - "overall"
+      grade_range: ["A", "B", "C"]
+    tags: ["sustainability", "known-brand"]
+
+  - name: "Nike Sustainability Analysis"
+    input: "Analyze the sustainability of Nike for the product at https://www.nike.com/t/air-max-90-mens-shoes/CN8490-002"
+    expected_output:
+      contains:
+        - "environmental"
+        - "labor"
+        - "transparency"
+      grade_range: ["B", "C", "D"]
+    tags: ["sustainability", "known-brand"]
+
+  - name: "Allbirds Carbon Neutral"
+    input: "Analyze the sustainability of Allbirds for the product at https://www.allbirds.com/products/mens-wool-runners"
+    expected_output:
+      contains:
+        - "carbon"
+        - "sustainable"
+        - "environmental"
+      grade_range: ["A", "B"]
+    tags: ["sustainability", "carbon-neutral"]
+
+  - name: "Unknown Brand Handling"
+    input: "Analyze the sustainability of UnknownBrand123 for the product at https://www.unknownbrand123.com/product"
+    expected_output:
+      contains:
+        - "limited data"
+        - "insufficient"
+      confidence_score:
+        max: 0.5
+    tags: ["edge-case", "unknown-brand"]
+
+  - name: "Tool Usage - Web Research"
+    input: "Search for sustainability reports for Patagonia"
+    expected_tools:
+      - "WebResearchAgent"
+    tags: ["tools", "web-research"]
+
+  - name: "Tool Usage - Supply Chain"
+    input: "Analyze the supply chain transparency of Nike"
+    expected_tools:
+      - "SupplyChainAgent"
+    tags: ["tools", "supply-chain"]
+
+  - name: "Multi-Agent Workflow"
+    input: "Provide a complete sustainability analysis for Everlane at https://www.everlane.com/products/mens-renew-long-puffer"
+    expected_tools:
+      - "WebResearchAgent"
+      - "SupplyChainAgent"
+      - "SustainabilityScorer"
+    expected_output:
+      contains:
+        - "environmental_score"
+        - "labor_score"
+        - "transparency_score"
+        - "overall_score"
+        - "rationale"
+    tags: ["integration", "full-workflow"]
+
+# Evaluation metrics
+metrics:
+  - name: "response_match_score"
+    weight: 0.4
+    description: "How well the response matches expected output"
+
+  - name: "tool_trajectory_score"
+    weight: 0.3
+    description: "Whether correct tools were used in correct order"
+
+  - name: "output_structure_score"
+    weight: 0.2
+    description: "Whether output follows SustainabilityRating schema"
+
+  - name: "confidence_accuracy"
+    weight: 0.1
+    description: "Whether confidence scores are reasonable"
+
+# Scoring thresholds
+thresholds:
+  pass: 0.7
+  good: 0.8
+  excellent: 0.9
+
+# Evaluation settings
+settings:
+  timeout: 60  # seconds per test case
+  retries: 2
+  parallel: false  # Run tests sequentially to avoid rate limits
+  save_results: true
+  results_dir: "./eval_results"

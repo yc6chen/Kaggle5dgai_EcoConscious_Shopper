@@ -1,0 +1,43 @@
+# Quick Evaluation Config - Faster subset for rapid testing
+# Run with: adk eval --config eval_quick.yaml
+
+agent: "agents.research_coordinator:coordinator_agent"
+
+test_cases:
+  - name: "Quick - Patagonia Test"
+    input: "Analyze sustainability for Patagonia"
+    expected_output:
+      contains:
+        - "environmental"
+        - "labor"
+    tags: ["quick", "smoke-test"]
+
+  - name: "Quick - Tool Usage Test"
+    input: "Search for Nike sustainability reports"
+    expected_tools:
+      - "WebResearchAgent"
+    tags: ["quick", "tools"]
+
+  - name: "Quick - Unknown Brand"
+    input: "Analyze UnknownBrand123"
+    expected_output:
+      contains:
+        - "limited"
+    tags: ["quick", "edge-case"]
+
+metrics:
+  - name: "response_match_score"
+    weight: 0.6
+
+  - name: "tool_trajectory_score"
+    weight: 0.4
+
+thresholds:
+  pass: 0.6
+
+settings:
+  timeout: 30
+  retries: 1
+  parallel: false
+  save_results: true
+  results_dir: "./eval_results"

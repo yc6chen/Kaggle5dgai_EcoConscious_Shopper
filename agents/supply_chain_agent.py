@@ -281,7 +281,7 @@ class SupplyChainAgent:
         agent = Agent(
             name="SupplyChainAgent",
             model=Gemini(
-                model="gemini-2.5-flash-lite",
+                model="gemini-2.5-flash",
                 retry_options=self.retry_config
             ),
             description="""
