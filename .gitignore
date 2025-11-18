@@ -58,6 +58,7 @@ Thumbs.db
 # Knowledge Base (as specified)
 Knowledge_Base/
 Prompt.md
+Enhanced_Tools_Prompt.md
 
 # Playwright
 .playwright/

@@ -16,7 +16,22 @@ from .sustainability_models import (
     TransparencyScore,
 )
 
+from .tool_models import (
+    ConsensusResult,
+    DataAnomaly,
+    EnhancedSearchResult,
+    ParallelExecutionResult,
+    ToolCall,
+    ToolPerformanceMetrics,
+    ToolPlan,
+    ToolResult,
+    ToolSelection,
+    ToolSelectionRequest,
+    ValidationResult,
+)
+
 __all__ = [
+    # Sustainability models
     "Certification",
     "CompanyESGData",
     "HealthStatus",
@@ -30,4 +45,16 @@ __all__ = [
     "SustainabilityDoc",
     "SustainabilityRating",
     "TransparencyScore",
+    # Tool models
+    "ConsensusResult",
+    "DataAnomaly",
+    "EnhancedSearchResult",
+    "ParallelExecutionResult",
+    "ToolCall",
+    "ToolPerformanceMetrics",
+    "ToolPlan",
+    "ToolResult",
+    "ToolSelection",
+    "ToolSelectionRequest",
+    "ValidationResult",
 ]
