@@ -3,10 +3,15 @@ WebResearchAgent - Specialist agent for web research and data gathering.
 
 This agent has access to multiple tools for searching, scraping, and gathering
 sustainability information from various web sources.
+
+ENHANCED with:
+- Dynamic Tool Selection (cost-optimized tool selection)
+- Parallel Tool Execution (concurrent execution with timeout management)
+- Result Validation (cross-verification and anomaly detection)
 """
 
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import os
 
 from google.adk.agents import Agent
@@ -17,10 +22,20 @@ from google.genai import types
 from tools.web_scraper import scrape_company_sustainability
 from tools.api_clients import search_sustainability_news, CertificationChecker
 
+# Import enhanced tool capabilities
+from tools.dynamic_tool_selector import DynamicToolSelector
+from tools.parallel_executor import ParallelToolExecutor
+from tools.result_validator import ToolResultValidator
+
 from models.sustainability_models import (
     SustainabilityDoc,
     Certification,
     NewsArticle,
+)
+
+from models.tool_models import (
+    EnhancedSearchResult,
+    ToolCall,
 )
 
 logger = logging.getLogger(__name__)
@@ -38,7 +53,7 @@ class WebResearchAgent:
     """
 
     def __init__(self):
-        """Initialize the Web Research Agent."""
+        """Initialize the Web Research Agent with enhanced capabilities."""
         self.retry_config = types.HttpRetryOptions(
             attempts=5,
             exp_base=7,
@@ -47,6 +62,216 @@ class WebResearchAgent:
         )
 
         self.cert_checker = CertificationChecker()
+
+        # Initialize enhanced tool capabilities
+        self.tool_selector = DynamicToolSelector()
+        self.parallel_executor = ParallelToolExecutor(max_workers=5, default_timeout=30)
+        self.validator = ToolResultValidator(min_confidence_threshold=0.6)
+
+        # Register tools with parallel executor
+        self._register_tools_for_parallel_execution()
+
+        logger.info("WebResearchAgent initialized with enhanced tool capabilities")
+
+    def _register_tools_for_parallel_execution(self) -> None:
+        """Register tool methods with the parallel executor."""
+        self.parallel_executor.register_tool(
+            "search_sustainability_reports",
+            self.search_sustainability_reports
+        )
+        self.parallel_executor.register_tool(
+            "scrape_company_esg_page",
+            self.scrape_company_esg_page
+        )
+        self.parallel_executor.register_tool(
+            "get_company_certifications",
+            self.get_company_certifications
+        )
+        self.parallel_executor.register_tool(
+            "search_labor_practices_news",
+            self.search_labor_practices_news
+        )
+
+        logger.debug("Registered 4 tools with parallel executor")
+
+    async def enhanced_sustainability_search(
+        self,
+        company: str,
+        budget: float = 10.0,
+        time_limit: int = 60
+    ) -> EnhancedSearchResult:
+        """
+        Enhanced sustainability search using dynamic tool selection,
+        parallel execution, and result validation.
+
+        This is the main enhanced method that demonstrates all three
+        advanced tool capabilities working together.
+
+        Args:
+            company: Company name to research
+            budget: Budget constraint in dollars (default: 10.0)
+            time_limit: Time limit in seconds (default: 60)
+
+        Returns:
+            EnhancedSearchResult with validated, cross-verified data
+        """
+        logger.info(
+            f"Starting enhanced sustainability search for {company} "
+            f"(budget=${budget}, time_limit={time_limit}s)"
+        )
+
+        # Step 1: Use DynamicToolSelector to choose optimal search strategies
+        task_description = f"sustainability_research_{company}"
+        context = {
+            "budget": budget,
+            "time_limit": time_limit,
+            "required_confidence": 0.7
+        }
+
+        selected_tool_calls = await self.tool_selector.select_optimal_tools(
+            task_description,
+            context
+        )
+
+        # Add company parameter to all tool calls
+        for tool_call in selected_tool_calls:
+            tool_call.parameters["company"] = company
+
+        logger.info(
+            f"Selected {len(selected_tool_calls)} tools: "
+            f"{[t.tool_name for t in selected_tool_calls]}"
+        )
+
+        # Step 2: Execute tools in parallel
+        execution_result = await self.parallel_executor.execute_tools_parallel(
+            selected_tool_calls
+        )
+
+        logger.info(
+            f"Parallel execution complete: "
+            f"{len(execution_result.successful_tools)} succeeded, "
+            f"{len(execution_result.failed_tools)} failed"
+        )
+
+        # Step 3: Validate and cross-verify results
+        tool_results = list(execution_result.successful_tools.values())
+
+        if not tool_results:
+            logger.warning("No successful tool results to validate")
+            validation = None
+            overall_confidence = 0.0
+        else:
+            # Validate results
+            validation_report = await self.validator.validate_and_enhance_results(
+                tool_results,
+                expected_fields=["company", "sustainability_score", "certifications"]
+            )
+
+            # Get detailed validation for the first result
+            if tool_results:
+                first_result_data = tool_results[0].result or {}
+                validation = await self.validator.validate_web_scraping_results(
+                    first_result_data,
+                    f"multiple_sources_{company}"
+                )
+            else:
+                validation = None
+
+            overall_confidence = validation_report.get("validation_score", 0.5)
+
+            logger.info(
+                f"Validation complete: confidence={overall_confidence:.2f}, "
+                f"anomalies={len(validation_report.get('anomalies', []))}"
+            )
+
+        # Aggregate data from all successful tools
+        aggregated_data = self._aggregate_tool_results(execution_result.successful_tools)
+
+        # Update tool metrics for future optimization
+        for tool_result in tool_results:
+            await self.tool_selector.update_tool_metrics(
+                tool_result.tool_name,
+                tool_result.success,
+                tool_result.cost,
+                tool_result.execution_time
+            )
+
+        # Create enhanced search result
+        result = EnhancedSearchResult(
+            data=aggregated_data,
+            validation=validation if validation else self._create_default_validation(),
+            sources=[t.tool_name for t in selected_tool_calls],
+            tool_execution_summary=execution_result,
+            overall_confidence=overall_confidence
+        )
+
+        logger.info(
+            f"Enhanced search complete for {company}: "
+            f"confidence={overall_confidence:.2%}"
+        )
+
+        return result
+
+    def _aggregate_tool_results(self, successful_tools: Dict[str, Any]) -> Dict[str, Any]:
+        """Aggregate data from multiple successful tool executions."""
+        aggregated = {
+            "sustainability_reports": [],
+            "esg_data": {},
+            "certifications": [],
+            "news_articles": [],
+            "sources": []
+        }
+
+        for tool_name, tool_result in successful_tools.items():
+            if not tool_result.result:
+                continue
+
+            result_data = tool_result.result
+
+            # Aggregate based on tool type
+            if "search_sustainability_reports" in tool_name:
+                if isinstance(result_data, list):
+                    aggregated["sustainability_reports"].extend(result_data)
+                elif isinstance(result_data, dict) and "data" in result_data:
+                    data = result_data["data"]
+                    if isinstance(data, list):
+                        aggregated["sustainability_reports"].extend(data)
+
+            elif "scrape_company_esg_page" in tool_name:
+                if isinstance(result_data, dict):
+                    aggregated["esg_data"].update(result_data)
+
+            elif "certifications" in tool_name:
+                if isinstance(result_data, list):
+                    aggregated["certifications"].extend(result_data)
+                elif isinstance(result_data, dict) and "data" in result_data:
+                    data = result_data["data"]
+                    if isinstance(data, list):
+                        aggregated["certifications"].extend(data)
+
+            elif "news" in tool_name:
+                if isinstance(result_data, list):
+                    aggregated["news_articles"].extend(result_data)
+                elif isinstance(result_data, dict) and "data" in result_data:
+                    data = result_data["data"]
+                    if isinstance(data, list):
+                        aggregated["news_articles"].extend(data)
+
+            aggregated["sources"].append(tool_name)
+
+        return aggregated
+
+    def _create_default_validation(self) -> Any:
+        """Create a default validation result when no validation could be performed."""
+        from models.tool_models import ValidationResult
+
+        return ValidationResult(
+            is_valid=False,
+            confidence_score=0.0,
+            validation_method="none",
+            cross_reference_sources=[],
+            anomalies_detected=["No data to validate"]
+        )
 
     async def search_sustainability_reports(
         self,

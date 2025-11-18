@@ -1,0 +1,258 @@
+# Tool Configuration for Enhanced Tool System
+# This file configures performance metrics, cost optimization, and validation settings
+
+# Dynamic Tool Selector Configuration
+tool_selector:
+  # Gemini model for intelligent tool selection
+  gemini_model: "gemini-2.5-flash"
+
+  # Cache directory for tool performance metrics
+  metrics_cache_dir: "./cache/tool_metrics"
+
+  # Exponential moving average weight for metric updates (0.0-1.0)
+  # Higher values give more weight to recent performance
+  metric_update_alpha: 0.3
+
+  # Tool registry with default characteristics
+  tools:
+    search_sustainability_reports:
+      typical_cost: 0.01      # USD
+      typical_latency: 5.0    # seconds
+      data_quality: high
+      reliability: 0.9
+      best_for:
+        - environmental_data
+        - corporate_reports
+
+    scrape_company_esg_page:
+      typical_cost: 0.05
+      typical_latency: 10.0
+      data_quality: medium
+      reliability: 0.75
+      best_for:
+        - company_specific_data
+        - recent_initiatives
+
+    get_company_certifications:
+      typical_cost: 0.02
+      typical_latency: 3.0
+      data_quality: high
+      reliability: 0.95
+      best_for:
+        - certification_verification
+        - standards_compliance
+
+    search_labor_practices_news:
+      typical_cost: 0.01
+      typical_latency: 4.0
+      data_quality: medium
+      reliability: 0.8
+      best_for:
+        - labor_practices
+        - recent_news
+        - controversies
+
+    google_search:
+      typical_cost: 0.005
+      typical_latency: 2.0
+      data_quality: variable
+      reliability: 0.85
+      best_for:
+        - general_research
+        - quick_facts
+
+    analyze_supply_chain:
+      typical_cost: 0.03
+      typical_latency: 8.0
+      data_quality: high
+      reliability: 0.85
+      best_for:
+        - supply_chain_transparency
+        - facility_data
+
+# Parallel Tool Executor Configuration
+parallel_executor:
+  # Maximum concurrent tool executions
+  max_workers: 5
+
+  # Default timeout for tool execution (seconds)
+  default_timeout: 30
+
+  # Retry configuration
+  retry:
+    max_retries: 3
+    backoff_factor: 2.0  # Exponential backoff multiplier
+
+  # Resource limits
+  resource_limits:
+    max_memory_mb: 1024
+    max_cpu_percent: 80
+
+# Tool Result Validator Configuration
+result_validator:
+  # Gemini model for fact-checking and validation
+  gemini_model: "gemini-2.5-flash"
+
+  # Minimum confidence threshold for accepting results
+  min_confidence_threshold: 0.6
+
+  # Data freshness requirements
+  freshness:
+    max_age_days: 730  # 2 years
+    warn_age_days: 365 # 1 year
+
+  # Validation rules for different data types
+  validation_rules:
+    sustainability_score:
+      type: numeric
+      min: 0
+      max: 100
+      check_outliers: true
+
+    carbon_emissions:
+      type: numeric
+      min: 0
+      unit_required: true
+      check_freshness: true
+
+    certification:
+      type: string
+      verify_source: true
+      known_values:
+        - B Corp
+        - Fair Trade
+        - LEED
+        - FSC
+        - Organic
+        - Carbon Neutral
+        - Rainforest Alliance
+        - Cradle to Cradle
+
+    date:
+      type: date
+      max_age_days: 730
+      future_check: true
+
+  # Anomaly detection settings
+  anomaly_detection:
+    # Outlier detection threshold (standard deviations)
+    outlier_threshold: 3.0
+
+    # Suspicious patterns to check
+    check_patterns:
+      - suspiciously_round_numbers
+      - duplicate_values
+      - missing_required_fields
+      - date_inconsistencies
+
+    # Severity thresholds
+    severity:
+      critical:
+        - future_dates
+        - impossible_values
+      high:
+        - large_variance
+        - contradictory_data
+      medium:
+        - slow_execution
+        - partial_data
+      low:
+        - minor_inconsistencies
+        - missing_optional_fields
+
+# Cost Optimization Settings
+cost_optimization:
+  # Default budget constraints
+  default_budget: 10.0  # USD
+  default_time_limit: 60  # seconds
+
+  # Budget tiers with different tool selection strategies
+  budget_tiers:
+    economy:
+      max_budget: 0.05
+      strategy: "minimize_cost"
+      tools_limit: 2
+
+    standard:
+      max_budget: 0.50
+      strategy: "balance"
+      tools_limit: 4
+
+    premium:
+      max_budget: 5.00
+      strategy: "maximize_quality"
+      tools_limit: 6
+
+  # Parallelization speedup factor
+  # Estimated time reduction from parallel execution
+  parallel_speedup_factor: 0.6  # 40% speedup
+
+# Integration Settings
+integration:
+  # Enable/disable enhanced features
+  enable_dynamic_selection: true
+  enable_parallel_execution: true
+  enable_result_validation: true
+
+  # Fallback to basic tools if enhanced tools fail
+  fallback_to_basic: true
+
+  # Logging
+  log_level: INFO
+  log_tool_metrics: true
+  log_validation_results: true
+
+# Performance Monitoring
+monitoring:
+  # Track performance metrics
+  track_metrics: true
+
+  # Metrics to track
+  metrics:
+    - tool_selection_accuracy
+    - parallel_execution_efficiency
+    - validation_effectiveness
+    - cost_savings
+    - execution_time
+
+  # Reporting intervals
+  report_interval_seconds: 300  # 5 minutes
+
+  # Alert thresholds
+  alerts:
+    high_failure_rate: 0.3      # Alert if >30% tools fail
+    high_cost: 1.0              # Alert if cost >$1 per query
+    slow_execution: 60.0        # Alert if >60s per query
+
+# Cache Settings
+cache:
+  # Enable caching of tool results
+  enable_cache: true
+
+  # Cache directory
+  cache_dir: "./cache"
+
+  # Cache TTL (time to live) in seconds
+  tool_metrics_ttl: 86400      # 24 hours
+  validation_results_ttl: 3600  # 1 hour
+
+  # Cache size limits
+  max_cache_size_mb: 100
+
+  # Auto-cleanup settings
+  auto_cleanup: true
+  cleanup_interval_hours: 24
+
+# Testing Configuration
+testing:
+  # Use mock tools for testing
+  use_mock_tools: false
+
+  # Test data directory
+  test_data_dir: "./tests/test_data"
+
+  # Validation test settings
+  validation_tests:
+    run_performance_tests: true
+    run_compatibility_tests: true
+    min_passing_score: 0.8
