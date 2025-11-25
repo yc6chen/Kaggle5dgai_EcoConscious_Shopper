@@ -7,7 +7,7 @@ from datetime import datetime
 
 from agents.research_coordinator import ResearchCoordinator
 from agents.sustainability_scorer import SustainabilityScorer
-from models.sustainability_models import SustainabilityRating
+from models.sustainability_models import SustainabilityRating, ResearchSummary, Certification
 
 
 class TestMultiAgentWorkflow:
@@ -89,7 +89,14 @@ class TestMultiAgentWorkflow:
         summary = ResearchSummary(
             brand="Allbirds",
             sustainability_reports=[],
-            certifications=["B-Corp"],
+            certifications=[
+                Certification(
+                    name="B-Corp",
+                    issuing_organization="B Lab",
+                    description="Certified B Corporation",
+                    verified=True
+                )
+            ],
             news_articles=[],
             supply_chain_data=None,
             esg_data=None
@@ -103,7 +110,8 @@ class TestMultiAgentWorkflow:
         cached = await coordinator.get_cached_analysis("Allbirds")
         assert cached is not None
         assert cached.brand == "Allbirds"
-        assert "B-Corp" in cached.certifications
+        assert len(cached.certifications) > 0
+        assert cached.certifications[0].name == "B-Corp"
 
     @pytest.mark.integration
     @pytest.mark.asyncio

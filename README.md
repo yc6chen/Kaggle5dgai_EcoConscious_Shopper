@@ -466,6 +466,20 @@ Copyright 2025
 
 Licensed under the Apache License, Version 2.0. See LICENSE file for details.
 
+## Development Tools & AI Assistance Disclosure
+
+**AI-Assisted Development**: This project was developed with assistance from AI coding tools, including Anthropic's Claude, which were used as development aids for code generation, debugging, documentation, and architectural planning. The use of AI assistants complies with the [Kaggle Competition Rules](https://www.kaggle.com/competitions/agents-intensive-capstone-project/rules), specifically:
+
+- **Section 6 (External Data and Tools)**: AI assistants like Claude are publicly available tools accessible to all participants
+- **Section 6.c (AMLT)**: Automated tools may be used to create submissions
+- **Reasonableness Criteria**: Claude's free tier is publicly accessible; the Pro tier ($20/month) constitutes minimal cost well below competition prize values
+
+**Original Work**: All code, architecture, and implementation decisions represent original work by the competition participant(s). AI tools were used as assistants in the development process, similar to using documentation, Stack Overflow, or other development resources.
+
+**Open Source Compliance**: All code in this repository, including any AI-assisted portions, is released under the CC-BY-SA 4.0 license as required by the competition rules for winning submissions. The code is provided with full documentation and reproduction instructions as specified in Section 8 (Winner's Obligations).
+
+**Transparency**: This disclosure is provided in the spirit of transparency and good sportsmanship within the Kaggle community, following practices documented in the community (see: [How to use ChatGPT in a competition](https://www.kaggle.com/code/jacoporepossi/how-to-use-chatgpt-in-a-competition-eda-part-1) and [community discussions](https://www.kaggle.com/questions-and-answers/407349)).
+
 ## Acknowledgments
 
 - Built with [Google Agent Development Kit (ADK)](https://google.github.io/adk-docs/)
