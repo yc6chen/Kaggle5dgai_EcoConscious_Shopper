@@ -3,7 +3,7 @@ Integration tests for FastAPI endpoints.
 """
 
 import pytest
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from fastapi.testclient import TestClient
 
 from main import app
@@ -50,7 +50,7 @@ class TestAnalyzeProductEndpoint:
     @pytest.mark.asyncio
     async def test_analyze_product_success(self):
         """Test successful product analysis."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/api/analyze-product",
                 json={"product_url": "https://www.patagonia.com/product/123"}
@@ -73,7 +73,7 @@ class TestAnalyzeProductEndpoint:
     @pytest.mark.asyncio
     async def test_analyze_product_invalid_url(self):
         """Test analysis with invalid URL."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/api/analyze-product",
                 json={"product_url": "not-a-valid-url"}
@@ -85,7 +85,7 @@ class TestAnalyzeProductEndpoint:
     @pytest.mark.asyncio
     async def test_analyze_product_missing_url(self):
         """Test analysis with missing URL."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post(
                 "/api/analyze-product",
                 json={}
@@ -99,7 +99,7 @@ class TestAnalyzeProductEndpoint:
     @pytest.mark.asyncio
     async def test_analyze_product_caching(self):
         """Test that results are cached."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             # First request
             response1 = await client.post(
                 "/api/analyze-product",
@@ -125,7 +125,7 @@ class TestCacheEndpoints:
     @pytest.mark.asyncio
     async def test_get_cached_rating_not_found(self):
         """Test retrieving non-existent cached rating."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/api/cached-rating/NonExistentBrand")
 
             assert response.status_code == 200
@@ -136,7 +136,7 @@ class TestCacheEndpoints:
     @pytest.mark.asyncio
     async def test_clear_cache(self):
         """Test clearing all cache."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.delete("/api/cache")
 
             assert response.status_code == 200
@@ -146,7 +146,7 @@ class TestCacheEndpoints:
     @pytest.mark.asyncio
     async def test_clear_brand_cache(self):
         """Test clearing specific brand cache."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.delete("/api/cache/TestBrand")
 
             assert response.status_code == 200
@@ -160,7 +160,7 @@ class TestStatsEndpoint:
     @pytest.mark.asyncio
     async def test_stats_endpoint(self):
         """Test stats endpoint returns metrics."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/api/stats")
 
             assert response.status_code == 200

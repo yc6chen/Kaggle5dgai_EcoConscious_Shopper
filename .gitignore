@@ -55,11 +55,6 @@ Thumbs.db
 !.agent_engine_config.json
 !extension/manifest.json
 
-# Knowledge Base (as specified)
-Knowledge_Base/
-Prompt.md
-Enhanced_Tools_Prompt.md
-
 # Playwright
 .playwright/
 
@@ -71,3 +66,8 @@ htmlcov/
 # Temporary files
 *.tmp
 *.temp
+
+# Image generation scripts (not for commit)
+create_icons.py
+generate_thumbnail.py
+create_thumbnail.py

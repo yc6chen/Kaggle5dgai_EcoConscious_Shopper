@@ -366,7 +366,7 @@ def extract_brand_from_url(product_url: str) -> str:
 
     # Extract main domain name
     parts = domain.split(".")
-    if parts:
+    if parts and parts[0]:  # Check that first part is not empty
         brand = parts[0].capitalize()
         return brand
 

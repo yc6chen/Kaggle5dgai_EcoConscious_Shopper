@@ -258,24 +258,9 @@ class SupplyChainAgent:
             Configured SupplyChainAgent
         """
         # Create function tools
-        analyze_tool = FunctionTool(
-            self.analyze_supply_chain,
-            name="analyze_supply_chain",
-            description="""
-            Analyze supply chain transparency for a brand using OpenSupplyHub data.
-            Returns transparency score, number of suppliers, geographic regions,
-            and risk factors. Results are cached for faster future lookups.
-            """
-        )
-
-        transparency_score_tool = FunctionTool(
-            self.calculate_transparency_score,
-            name="calculate_transparency_score",
-            description="""
-            Calculate detailed transparency score breakdown from raw supply chain data.
-            Provides scores for supplier disclosure, traceability, and audit availability.
-            """
-        )
+        # Note: name and description come from function name and docstring
+        analyze_tool = FunctionTool(self.analyze_supply_chain)
+        transparency_score_tool = FunctionTool(self.calculate_transparency_score)
 
         # Create the agent
         agent = Agent(

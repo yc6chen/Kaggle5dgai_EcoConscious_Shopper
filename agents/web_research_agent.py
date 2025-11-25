@@ -418,41 +418,11 @@ class WebResearchAgent:
             Configured WebResearchAgent
         """
         # Create function tools for each capability
-        search_reports_tool = FunctionTool(
-            self.search_sustainability_reports,
-            name="search_sustainability_reports",
-            description="""
-            Search for sustainability reports and ESG documents for a company.
-            Finds published reports, disclosures, and environmental impact statements.
-            """
-        )
-
-        scrape_esg_tool = FunctionTool(
-            self.scrape_company_esg_page,
-            name="scrape_company_esg_page",
-            description="""
-            Visit company website and extract ESG (Environmental, Social, Governance)
-            data from their sustainability pages. Returns environmental and social scores.
-            """
-        )
-
-        certifications_tool = FunctionTool(
-            self.get_company_certifications,
-            name="get_company_certifications",
-            description="""
-            Identify and verify sustainability certifications for a company.
-            Checks for B Corp, Fair Trade, LEED, FSC, and other certifications.
-            """
-        )
-
-        labor_news_tool = FunctionTool(
-            self.search_labor_practices_news,
-            name="search_labor_practices_news",
-            description="""
-            Search for recent news articles about company's labor practices,
-            worker treatment, and supply chain ethics.
-            """
-        )
+        # Note: name and description come from function name and docstring
+        search_reports_tool = FunctionTool(self.search_sustainability_reports)
+        scrape_esg_tool = FunctionTool(self.scrape_company_esg_page)
+        certifications_tool = FunctionTool(self.get_company_certifications)
+        labor_news_tool = FunctionTool(self.search_labor_practices_news)
 
         # Create the agent with all tools
         agent = Agent(
